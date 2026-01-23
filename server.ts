@@ -1,6 +1,8 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 const port = 3000;
 
 app.use(express.json());
@@ -113,43 +115,6 @@ app.post("/checkSubmission", (req, res) => {
 
   return res.status(200).json({ matched: false });
 });
-
-// app.get("/generateGame", (req, res) => {
-//   // Generate 4 unique numbers between 0 and the length of the gameObjects array
-//   const game = [];
-//   const useGames = [...gameOptions];
-//   const gameLength = 4;
-//   for (let i = 0; i < gameLength; i++) {
-//     const num = Math.floor(Math.random() * useGames.length);
-//     game.push(useGames[num]);
-//     useGames.splice(num, 1);
-//   }
-
-//   res.statusCode = 200;
-//   res.json(game);
-// });
-// app.post("/checkSubmission", (req, res) => {
-//   const { gameData, submission } = req.body;
-//   const sortedSubmission = [...submission].sort();
-
-//   for (let i = 0; i < gameData.length; i++) {
-//     const sortedWords = [...gameData[i].words].sort();
-//     const isMatch =
-//       sortedWords.length === sortedSubmission.length &&
-//       sortedWords.every((word, index) => {
-//         return word === sortedSubmission[index];
-//       });
-
-//     if (isMatch) {
-//       return res.status(200).json({
-//         matched: true,
-//         category: gameData[i].title,
-//         color: gameData[i].color,
-//       });
-//     }
-//   }
-//   return res.status(200).json({ matched: false });
-// });
 
 app.listen(port, () => {
   console.log(`Now listening on port ${port}`);
