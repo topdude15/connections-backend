@@ -60,37 +60,37 @@ const games = [
   },
 ];
 
-app.get("/getRandomGameID", (req, res) => {
+app.get("/puzzles/random", (_, res) => {
   const gameID = games[Math.floor(Math.random() * games.length)].id;
   return res.status(200).json({ gameID: gameID });
 });
 
-app.post("/getGameByID", (req, res) => {
-  const { gameID } = req.body;
-  const game = games.find((item) => {
-    return item.id === gameID;
-  });
-  if (game) {
-    let words: string[] = [];
-    for (let i = 0; i < game.categories.length; i++) {
-      words = [...words, ...game.categories[i].words];
+app.get("/puzzles/:puzzleID", (req, res) => {
+  const puzzleID = Number(req.params.puzzleID);
+  if (puzzleID != null) {
+    const game = games.find((item) => {
+      return item.id === Number(puzzleID);
+    });
+    if (game) {
+      let words: string[] = [];
+      for (let i = 0; i < game.categories.length; i++) {
+        words = [...words, ...game.categories[i].words];
+      }
+      return res.status(200).json({ message: "This game was found", words: words });
+    } else {
+      return res.status(404).json({ message: "Error: No game found at this ID" });
     }
-    return res
-      .status(200)
-      .json({ message: "This game was found", words: words });
   } else {
-    return res.status(404).json({ message: "Error: No game found at this ID" });
+    return res.status(400).json({ message: "Error: Invalid puzzle ID provided." });
   }
 });
-
-app.post("/checkSubmission", (req, res) => {
-  const { gameID, submission } = req.body;
+app.post("/puzzles/:puzzleID/submit", (req, res) => {
+  const puzzleID = Number(req.params.puzzleID);
+  const { submission } = req.body;
   const sortedSubmission = [...submission].sort();
-
   const game = games.find((item) => {
-    return item.id === gameID;
+    return item.id === puzzleID;
   });
-
   if (game) {
     for (let i = 0; i < game.categories.length; i++) {
       const sortedWords = [...game.categories[i].words].sort();
@@ -99,7 +99,6 @@ app.post("/checkSubmission", (req, res) => {
         sortedWords.every((word, index) => {
           return word === sortedSubmission[index];
         });
-
       if (isMatch) {
         return res.status(200).json({
           matched: true,
@@ -109,12 +108,20 @@ app.post("/checkSubmission", (req, res) => {
       }
     }
   } else {
-    return res
-      .status(404)
-      .json({ message: "No game with this ID number could be found." });
+    return res.status(404).json({ message: "No game with this ID number could be found." });
   }
-
   return res.status(200).json({ matched: false });
+});
+app.get("/puzzles/:puzzleID/answer", (req, res) => {
+  const puzzleID = Number(req.params.puzzleID);
+  const game = games.find((item) => {
+    return item.id === puzzleID;
+  });
+  if (game) {
+    return res.status(200).json({ game });
+  } else {
+    return res.status(404).json({ mesage: "Error: No game found at this ID" });
+  }
 });
 
 app.listen(port, () => {
