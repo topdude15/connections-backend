@@ -82,6 +82,7 @@ app.post("/getGameByID", (req, res) => {
     return res.status(404).json({ message: "Error: No game found at this ID" });
   }
 });
+
 app.post("/checkSubmission", (req, res) => {
   const { gameID, submission } = req.body;
   const sortedSubmission = [...submission].sort();
